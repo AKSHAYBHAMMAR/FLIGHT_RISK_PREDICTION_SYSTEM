@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airlytics - Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Fallback */
+            background-image: url('aeroplane_background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative antialiased text-slate-100">
+    
+    <!-- Dark gradient overlay to make text readable -->
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-slate-900/10 z-0"></div>
+
+    <div class="relative z-10 w-full max-w-md p-8 m-4 glass-panel rounded-2xl shadow-2xl transform transition-all">
+        <div class="flex flex-col items-center mb-8">
+            <div class="w-16 h-16 rounded-full bg-sky-500/20 flex items-center justify-center mb-4 border border-sky-400/30">
+                <i data-lucide="plane" class="text-sky-400 w-8 h-8 transform -rotate-45"></i>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-sky-300 bg-clip-text text-transparent">Airlytics</h1>
+            <p class="text-slate-300 mt-2 text-sm text-center">Flight Delay Prediction System</p>
+        </div>
+
+        <form id="login-form" class="flex flex-col gap-5">
+            <div id="error-message" class="hidden bg-red-500/20 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg text-center"></div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-slate-300 mb-1">Email</label>
+                <div class="relative w-full">
+                    <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                    <input type="email" id="email" required placeholder="pilot@airlytics.com"
+                        class="w-full bg-slate-900/60 border border-slate-600 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all placeholder-slate-400">
+                </div>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-300 mb-1">Password</label>
+                <div class="relative w-full">
+                    <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                    <input type="password" id="password" required placeholder="••••••••"
+                        class="w-full bg-slate-900/60 border border-slate-600 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all placeholder-slate-400">
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full mt-2 bg-blue-500 hover:bg-sky-400 text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:shadow-[0_0_20px_rgba(56,189,248,0.5)] flex items-center justify-center gap-2">
+                <span>Sign In</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center text-sm text-slate-400">
+            <p>New pilot? <a href="signup.html" class="text-sky-400 hover:text-sky-300 transition-colors">Register here</a></p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // SHA-256 Hashing Implementation 
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('error-message');
+            
+            errorMsg.classList.add('hidden');
+
+            try {
+                let users = JSON.parse(localStorage.getItem('airlytics_db')) || {};
+                
+                // Validate if user exists
+                if (!users[email]) {
+                    errorMsg.textContent = "Account not found. Please sign up first.";
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+
+                // Verify hashed password
+                const hashedPassword = await hashPassword(password);
+                if (users[email].passwordHash !== hashedPassword) {
+                    errorMsg.textContent = "Incorrect password. Please try again.";
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+
+                // Valid login
+                localStorage.setItem('airlytics_auth', email);
+                window.location.href = 'index.html';
+                
+            } catch (err) {
+                console.error("Login verification failed:", err);
+                errorMsg.textContent = "Authentication error. Please try again.";
+                errorMsg.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
