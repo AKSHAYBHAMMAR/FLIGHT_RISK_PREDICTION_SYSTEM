@@ -2,6 +2,17 @@
 // Main application controller
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Auth Guard
+    const auth = localStorage.getItem('airlytics_auth');
+    if (!auth) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Display User
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay) userDisplay.textContent = auth;
+
     // Initialize icons
     lucide.createIcons();
     

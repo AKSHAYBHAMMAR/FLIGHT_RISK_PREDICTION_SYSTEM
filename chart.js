@@ -10,7 +10,9 @@ function initChart() {
 }
 
 function updateDelayChart(waypoints) {
-    const ctx = document.getElementById('delayChart').getContext('2d');
+    const el = document.getElementById('delayChart');
+    if (!el) return;
+    const ctx = el.getContext('2d');
     
     const labels = waypoints.map((wp, i) => wp.name);
     const data = waypoints.map(wp => wp.delay);
@@ -105,7 +107,9 @@ function updateDelayChart(waypoints) {
 let riskPieChartInstance = null;
 
 function updateRiskPieChart(waypoints) {
-    const ctx = document.getElementById('riskPieChart').getContext('2d');
+    const el = document.getElementById('riskPieChart');
+    if (!el) return;
+    const ctx = el.getContext('2d');
     
     let low = 0, moderate = 0, high = 0;
     waypoints.forEach(wp => {

@@ -64,6 +64,11 @@ function initMap() {
     L.control.zoom({
         position: 'bottomright'
     }).addTo(mapInstance);
+
+    // Dynamic icon initialization for popups
+    mapInstance.on('popupopen', () => {
+        lucide.createIcons();
+    });
 }
 
 function updateMap(data) {
@@ -134,7 +139,7 @@ function updateMap(data) {
             </div>
         `;
 
-        const markerHtml = `<div class="w-3 h-3 rounded-full bg-[${color}] ${pulseClass}"></div>`;
+        const markerHtml = `<div class="w-3 h-3 rounded-full ${pulseClass}" style="background-color: ${color}; border: 1px solid rgba(15, 23, 42, 0.8);"></div>`;
         const divIcon = L.divIcon({ className: 'custom-div-icon', html: markerHtml, iconSize: [12, 12], iconAnchor: [6, 6] });
 
         L.marker([wp.lat, wp.lng], { icon: divIcon })
